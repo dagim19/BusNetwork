@@ -69,4 +69,18 @@ public class Stations {
         return null;
     }
 
+    public void updateStnFile() {
+        if (changed) {
+            try {
+                Out out = new Out(STATIONS_FILE_NAME);
+                out.println(numberOfStations);
+                for (Station s: stationList) {
+                    out.println(s.getName() + " " + s.getStationID());
+                }
+            }catch(IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
 }
