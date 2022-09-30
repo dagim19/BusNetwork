@@ -44,8 +44,6 @@ public class DList<T>{
         }
     }
 
-    public void insertAfter()
-
     public boolean removeFront(){
         if (isEmpty()){
             return false;

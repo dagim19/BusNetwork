@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 public class Stations {
+    private final String STATIONS_FILE_NAME = "stations.txt";
     private int numberOfStations;
     private int avail;
     private boolean changed;
@@ -13,10 +14,10 @@ public class Stations {
         changed = false;
     }
 
-    boolean buildStations(String stfFileName) {
+    boolean buildStations() {
         int numberOfStations;
         try {
-            In in = new In(stfFileName);
+            In in = new In(STATIONS_FILE_NAME);
             numberOfStations = in.readInt();
             for (int i = 0; i < numberOfStations; i++) {
                 String name = in.readString();
