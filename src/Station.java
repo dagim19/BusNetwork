@@ -1,8 +1,8 @@
-public class station implements Comparable {
+public class Station implements Comparable {
     private String name;
     private int stationID;
 
-    public station(String name, int stationID) {
+    public Station(String name, int stationID) {
         this.name = name;
         this.stationID = stationID;
     }
@@ -25,7 +25,7 @@ public class station implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        station s = (station) o;
+        Station s = (Station) o;
         if (s.stationID == this.stationID) return 0;
         else if (s.stationID > this.stationID) return -1;
         else return 1;

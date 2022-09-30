@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
-public class stations {
+public class Stations {
     private int numberOfStations;
     private int avail;
     private boolean changed;
-    private ArrayList<station> stationList;
+    private ArrayList<Station> stationList;
 
-    public stations() {
-        stationList = new ArrayList<station>();
+    public Stations() {
+        stationList = new ArrayList<Station>();
         numberOfStations = 0;
         avail = 0;
         changed = false;
@@ -21,7 +21,7 @@ public class stations {
             for (int i = 0; i < numberOfStations; i++) {
                 String name = in.readString();
                 int stationID = in.readInt();
-                stationList.add(new station(name, stationID));
+                stationList.add(new Station(name, stationID));
             }
         }catch(IllegalArgumentException e) {
             return false;
@@ -34,7 +34,7 @@ public class stations {
         return numberOfStations;
     }
 
-    public boolean addStation(station station) {
+    public boolean addStation(Station station) {
         if (stationList.add(station)) {
             numberOfStations++;
             changed = true;
@@ -43,7 +43,7 @@ public class stations {
         return false;
     }
 
-    public boolean deleteStation(station station) {
+    public boolean deleteStation(Station station) {
         if (stationList.remove(station)) {
             numberOfStations--;
             changed = true;
@@ -53,7 +53,7 @@ public class stations {
     }
 
     public int mapStation(String stationName) {
-        for (station s: stationList) {
+        for (Station s: stationList) {
             if(s.getName() == stationName)
                 return s.getStationID();
         }
@@ -61,7 +61,7 @@ public class stations {
     }
 
     public String mapStation(int stationId) {
-        for (station s: stationList) {
+        for (Station s: stationList) {
             if(s.getStationID() == stationId)
                 return s.getName();
         }
