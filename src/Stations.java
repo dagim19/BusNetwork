@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Stations {
     private final String STATIONS_FILE_NAME = "stations.txt";
@@ -6,9 +7,11 @@ public class Stations {
     private int avail;
     private boolean changed;
     private ArrayList<Station> stationList;
+    HashSet<Integer> stnIds;
 
     public Stations() {
         stationList = new ArrayList<Station>();
+        stnIds = new HashSet<>();
         numberOfStations = 0;
         avail = 0;
         changed = false;
@@ -22,6 +25,7 @@ public class Stations {
             for (int i = 0; i < numberOfStations; i++) {
                 String name = in.readString();
                 int stationID = in.readInt();
+                stnIds.add(stationID);
                 stationList.add(new Station(name, stationID));
             }
         }catch(IllegalArgumentException e) {

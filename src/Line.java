@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Line {
     private int lineNumber;
     private int numberOfStations;
-    private Station start;
+    private StationData start;
     private ArrayList<StationData> stationList;
 
     // constructor
@@ -30,11 +30,11 @@ public class Line {
         this.numberOfStations = numberOfStations;
     }
 
-    public Station getStart() {
+    public StationData getStart() {
         return start;
     }
 
-    public void setStart(Station start) {
+    public void setStart(StationData start) {
         this.start = start;
     }
 

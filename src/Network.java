@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Network {
@@ -8,10 +9,11 @@ public class Network {
     boolean changed;
 
     ArrayList<Line> lines;
-
+    HashSet<Integer> lineNumbers;
 
     public Network() {
         lines = new ArrayList<Line>();
+        lineNumbers = new HashSet<>();
         nubLines = 0;
         avail = 0;
         changed = false;
@@ -25,11 +27,14 @@ public class Network {
             for (int i = 0; i < nubLines; i++) {
                 int lineNumber = in.readInt();
                 int numberOfStations = in.readInt();
+                lineNumbers.add(lineNumber);
                 Line line = new Line(lineNumber, numberOfStations);
                 for (int j = 0; j < numberOfStations; j++) {
                     int stnId = in.readInt();
                     int distance = in.readInt();
-                    line.addStation(new StationData(stnId, distance));
+                    StationData stn = new StationData(stnId, distance);
+                    line.addStation(stn);
+                    if(j == 0) line.setStart(stn);
                 }
                 lines.add(line);
             }
@@ -72,6 +77,13 @@ public class Network {
                 count++;
         }
         return count;
+    }
+
+    public Line getLine(int lineNumber) {
+        for(Line l: lines)
+            if(l.getLineNumber() == lineNumber)
+                return l;
+        return null;
     }
 
     public int LineThroughStations(int stnId1, int stnId2) {
