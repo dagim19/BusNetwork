@@ -1,282 +1,439 @@
 import java.awt.*;
+import java.io.FileNotFoundException;
 
 public class App {
-    private static int networkMenu() {
 
-//        Thread.dumpStack();
+    static Network network;
+    static Stations stations;
 
+    private static void clear() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+
+
+    private static int editChoice() {
         int choice;
-        do {
-            StdOut.println("Welcome to the main switchboard");
-            StdOut.println("1. Network Information");
-            StdOut.println("2. Edit Network");
-            StdOut.print("Please select an option: ");
-            choice = StdIn.readInt();
-            if(choice != 1 && choice != 2) {
-                StdOut.println("Invalid choice, please try again");
-                StdOut.print("\033[H\033[2J");
-            }
-        }while(choice != 1 && choice != 2);
+        clear();
+        StdOut.println("What do you want to do?");
+        StdOut.println("Press 1: Add a new line");
+        StdOut.println("Press 2: Add a new station to an existing line");
+        StdOut.println("Press 3: Remove a line");
+        StdOut.println("Press 4: Remove a station from an existing line");
+        StdOut.println("Press 5: Change the distance between two stations");
+        StdOut.println("Press 6: Change the line number of a line");
+        StdOut.println("Press 7: Change the station number of a station");
+        StdOut.println("Press 8: Return to main menu");
+        StdOut.print(">");
+        choice = StdIn.readInt();
         return choice;
     }
 
-    private static  int networkInformation() {
+    private static void handleEdit() {
         int choice;
+
         do {
-            StdOut.println("1. All Network Information");
-            StdOut.println("2. Line Information");
-            StdOut.println("3. Station Information");
-            StdOut.println("4. Shortest Path Information");
-            StdOut.println("5. Return to Main Menu");
-            StdOut.println("6. Exit");
-            StdOut.print("Please select an option: ");
-            choice = StdIn.readInt();
-
-            if(choice == 5)
-                networkMenu();
-
-            if(choice != 1 && choice != 2 && choice != 3 && choice != 4 && choice != 5 && choice != 6) {
-                StdOut.println("Invalid choice, please try again");
-                StdOut.print("\033[H\033[2J");
+            choice = editChoice();
+            if(choice < 1 || choice > 8) {
+                StdOut.println("You entered an invalid choice...");
+                continue;
             }
-        }while(choice != 1 && choice != 2 && choice != 3 && choice != 4 && choice != 5 && choice != 6);
+
+            switch (choice) {
+                case 1:
+                {
+                   clear();
+                   StdOut.println("Enter New Line");
+                   int lineNumber;
+                   do {
+                       StdOut.println("Please enter the new line number. (Enter -1 to abort)\n>");
+                       lineNumber = StdIn.readInt();
+                       if(network.lineNumbers.contains(lineNumber))
+                           StdOut.println("Line number already exists. Please enter a new line number.");
+                       else break;
+                     }while(network.lineNumbers.contains(lineNumber));
+
+                   if(lineNumber == -1)
+                       break;
+                   StdOut.println("Enter the number of stations in the line.\n>");
+                   int numberOfStations = StdIn.readInt();
+                   Line line = new Line(lineNumber, numberOfStations);
+                   StdOut.println("Do you want to add stations to the line? (y/n)\n>");
+                   String choice2 = StdIn.readString();
+                   if(choice2.equals("y")) {
+                       for (int i = 0; i < numberOfStations; i++) {
+                           StdOut.println("Enter the station number.\n>");
+                           int stnId = StdIn.readInt();
+                           if(!stations.stnIds.contains(stnId)) {
+                               StdOut.println("The station you entered is new");
+                               StdOut.println("Please enter the name for the station.\n>");
+                               String name = StdIn.readString();
+                               Station s = new Station(name, stnId);
+                               stations.addStation(s);
+                           }
+                           StdOut.println("Enter the distance between the station and the previous station.\n>");
+                           float distance = StdIn.readFloat();
+                           StationData stn = new StationData(stnId, distance);
+                           line.addStation(stn);
+                           if(i == 0) line.setStart(stn);
+                       }
+                   }
+                   if (network.lines.add(line)) {
+                       network.lineNumbers.add(lineNumber);
+                       StdOut.println("Successfully added the new line in the network");
+                       StdOut.println("Press any key to continue...");
+                       StdIn.readString();
+                   }else{
+                          StdOut.println("Failed to add the new line in the network");
+                          StdOut.println("Press any key to continue...");
+                          StdIn.readString();
+                   }
+                }
+                break;
+                case 2:
+                {
+                    // add new station to an existing station.
+                    clear();
+                    StdOut.println("Enter a new station to an existing line.");
+                    StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
+                    int lineNumber = StdIn.readInt();
+                    do {
+                        if(!network.lineNumbers.contains(lineNumber)) {
+                            StdOut.println("The line number you entered does not exist. Please enter a valid line number.\n>");
+                            lineNumber = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!network.lineNumbers.contains(lineNumber));
+
+                    if(lineNumber == -1)
+                        break;
+
+                    StdOut.println("Enter the station number.\n>");
+                    int stnId = StdIn.readInt();
+                    if(!stations.stnIds.contains(stnId)) {
+                        StdOut.println("The station you entered is new");
+                        StdOut.println("Please enter the name for the station.\n>");
+                        String name = StdIn.readString();
+                        Station s = new Station(name, stnId);
+                        stations.addStation(s);
+                    }
+                    StdOut.println("Enter the distance between the station and the previous station.\n>");
+                    float distance = StdIn.readFloat();
+                    StationData stn = new StationData(stnId, distance);
+                    if(network.lines.get(network.lineIndex(lineNumber)).addStation(stn)) {
+                        StdOut.println("Successfully added the new station");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }else{
+                        StdOut.println("Failed to add the new station");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 3:
+                {
+                    // remove a line
+                    clear();
+                    StdOut.println("Remove a line from the network");
+                    StdOut.println("Enter the line number to remove. (Enter -1 to abort)\n>");
+                    int lineNumber = StdIn.readInt();
+                    do {
+                        if(!network.lineNumbers.contains(lineNumber)) {
+                            StdOut.println("The line number you entered does not exist. Please enter a valid line number.\n>");
+                            lineNumber = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!network.lineNumbers.contains(lineNumber));
+
+                    if(lineNumber == -1)
+                        break;
+
+                    if(network.lines.remove(network.lines.get(network.lineIndex(lineNumber)))) {
+                        network.lineNumbers.remove(network.lineIndex(lineNumber));
+                        StdOut.println("Successfully removed the line");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }else{
+                        StdOut.println("Failed to remove the line");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 4:
+                {
+                    clear();
+                    StdOut.println("Remove a station from a line");
+                    StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
+                    int lineNumber = StdIn.readInt();
+                    do {
+                        if(!network.lineNumbers.contains(lineNumber)) {
+                            StdOut.println("The line number you entered does not exist. Please enter a valid line number.\n>");
+                            lineNumber = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!network.lineNumbers.contains(lineNumber));
+
+                    if(lineNumber == -1)
+                        break;
+
+                    int stnId;
+                    do {
+                        StdOut.println("Please enter the station number you want do delete. (Enter -1 to abort)");
+                        stnId = StdIn.readInt();
+
+                        if(!stations.stnIds.contains(stnId)) {
+                            StdOut.println("The station number you entered is invalid. Please enter a valid station number.\n>");
+                        }
+                    }while(!stations.stnIds.contains(stnId) && stnId != -1);
+
+                    if(stnId == -1)
+                        break;
+
+                    StdOut.println("Enter the distance between the station and the previous station.\n>");
+                    float distance = StdIn.readFloat();
+                    StationData stn = new StationData(stnId, distance);
+                    if(network.lines.get(network.lineIndex(lineNumber)).deleteStation(stn)) {
+                       StdOut.println("Successfully removed the station");
+                       StdOut.println("Press any key to continue...");
+                       StdIn.readString();
+                    }else{
+                        StdOut.println("Failed to delete the station");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 5:
+                {
+                    // change the distance between two stations
+                    clear();
+                    StdOut.println("Change the distance between two stations");
+                    StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
+                    int lineNumber = StdIn.readInt();
+                    do {
+                        if(!network.lineNumbers.contains(lineNumber)) {
+                            StdOut.println("The line number you entered does not exist. Please enter a valid line number.\n>");
+                            lineNumber = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!network.lineNumbers.contains(lineNumber));
+
+                    if(lineNumber == -1)
+                        break;
+
+                    int stnId;
+                    do {
+                        StdOut.println("Please enter the station number you want do delete. (Enter -1 to abort)");
+                        stnId = StdIn.readInt();
+
+                        if(!stations.stnIds.contains(stnId)) {
+                            StdOut.println("The station number you entered is invalid. Please enter a valid station number.\n>");
+                        }
+                    }while(!stations.stnIds.contains(stnId) && stnId != -1);
+
+                    if(stnId == -1)
+                        break;
+
+                    StdOut.println("Enter the distance between the station and the previous station.\n>");
+
+                    float distance = StdIn.readFloat();
+                    StationData stn = new StationData(stnId, distance);
+                    if(network.lines.get(network.lineIndex(lineNumber)).changeDistance(stn)) {
+                       StdOut.println("Successfully changed the distance");
+                       StdOut.println("Press any key to continue...");
+                       StdIn.readString();
+                    }else {
+                        StdOut.println("Failed to change the distance");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 6:
+                {
+                    // Change the line number of a line
+                    clear();
+                    StdOut.println("Change the line number of a line");
+                    StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
+                    int lineNumber = StdIn.readInt();
+
+                    do {
+                        if(!network.lineNumbers.contains(lineNumber)) {
+                            StdOut.println("The line number you entered does not exist. Please enter a valid line number.\n>");
+                            lineNumber = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!network.lineNumbers.contains(lineNumber));
+
+                    if(lineNumber == -1)
+                        break;
+
+                    StdOut.println("Enter the new line number.\n>");
+                    int newLineNumber = StdIn.readInt();
+
+                    if(network.changeLineNumber(lineNumber, newLineNumber)) {
+                        StdOut.println("Successfully changed the line number");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }else {
+                        StdOut.println("Failed to change the line number");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 7:
+                {
+                    // Change the station number of a station
+                    clear();
+
+                    StdOut.println("Change the station number of a station");
+                    StdOut.println("Enter the station number. (Enter -1 to abort)\n>");
+                    int stnId = StdIn.readInt();
+
+                    do {
+                        if(!stations.stnIds.contains(stnId)) {
+                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            stnId = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!stations.stnIds.contains(stnId) && stnId != -1);
+
+                    if(stnId == -1)
+                        break;
+
+                    StdOut.println("Enter the new station number.\n>");
+                    int newStnId = StdIn.readInt();
+
+                    if(stations.changeStnId(stnId, newStnId)) {
+                        StdOut.println("Successfully changed the station number");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }else{
+                        StdOut.println("Failed to change the station number");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 8:
+                {
+                    // back to main menu
+                    clear();
+                    return;
+                }
+            }
+        }while(choice < 1 || choice > 8 || choice != 8);
+    }
+
+
+    private static int menuChoice() {
+        int choice;
+        // clear the screen
+        System.out.print("\033[H\033[2J");
+        StdOut.println("MAIN SWITCH BOARD");
+        StdOut.println("Press 1: Network Information");
+        StdOut.println("Press 2: Edit Network");
+        StdOut.println("Press 3: Network Changed. Save Changes");
+        StdOut.println("Press 4: Undo All Changes");
+        StdOut.println("Press 5: Exit");
+        StdOut.print(">");
+        choice = StdIn.readInt();
         return choice;
     }
 
-    private static int editNetwork() {
-
+    private static void mainMenu() {
         int choice;
         do {
-            StdOut.println("1. Introduce new station");
-            StdOut.println("2. Change Station Name");
-            StdOut.println("3. Change Station Number");
-            StdOut.println("4. Insert A New Station On A Line");
-            StdOut.println("5. Delete Station From Line");
-            StdOut.println("6. Delete Station From Network");
-            StdOut.println("7. Introduce a new line");
-            StdOut.println("8. Change Line Number");
-            StdOut.println("9. Delete A line");
-            StdOut.println("10. Network Changed. Save Changes.");
-            StdOut.println("11. Undo All Changes.");
-            StdOut.println("12. Back To Main Switch Board");
-            StdOut.println("13. Exit");
-            StdOut.print("Please select an option: ");
-            choice = StdIn.readInt();
-
-            if(choice != 1 && choice != 2 && choice != 3 && choice != 4 && choice != 5 && choice != 6 && choice != 7 && choice != 8 && choice != 9 && choice != 10 && choice != 11 && choice != 12 && choice != 13) {
-                StdOut.println("Invalid choice, please try again");
-                StdOut.print("\033[H\033[2J");
+            choice = menuChoice();
+            if(choice < 1 || choice > 5) {
+                StdOut.println("Invalid choice. Please Enter again.");
+                StdDraw.pause(1000);
+                continue;
             }
-        }while(choice != 1 && choice != 2 && choice != 3 && choice != 4 && choice != 5 && choice != 6 && choice != 7 && choice != 8 && choice != 9 && choice != 10 && choice != 11 && choice != 12 && choice != 13);
-        return choice;
+
+            switch (choice) {
+                case 1:
+                {
+                    clear();
+                    StdOut.println("Network Information");
+                    StdOut.println("There are " + network.nubLines + " lines in the network.");
+                    StdOut.println("========================================");
+                    StdOut.println("Line Number\tNumber of Stations");
+                    StdOut.println("========================================");
+                    for (Line line: network.lines) {
+                        StdOut.println(line.getLineNumber() + "\t\t" + line.getNumberOfStations());
+                    }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readChar();
+                }
+                break;
+                case 2:
+                {
+                    clear();
+                    handleEdit();
+                }
+                break;
+                case 3:
+                {
+                    clear();
+                    StdOut.println("Saving changes...");
+                    if (network.updateNetworkFile() && stations.updateStnFile()){
+                        StdOut.println("Successfully saved changes");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }else {
+                        StdOut.println("Failed to save changes");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 4:
+                {
+                    clear();
+                    StdOut.println("Undoing all changes...");
+                    if(network.undoChanges() && stations.undoChanges()) {
+                        StdOut.println("Successfully undone all changes");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }else {
+                        StdOut.println("Failed to undo all changes");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readString();
+                    }
+                }
+                break;
+                case 5:
+                {
+                    clear();
+                    StdOut.println("Exiting...");
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
+                    System.exit(0);
+                }
+                break;
+            }
+        }while (choice < 1 || choice > 5 || choice != 5);
     }
+
 
     public static void main(String[] args) {
-        Network ntwrk = new Network();
-        Stations stns = new Stations();
-        ntwrk.buildNetwork();
-        stns.buildStations();
-        boolean open = true;
-        while(open) {
-            switch (networkMenu()) {
-                case 1: {
-                    switch (networkInformation()) {
-                        case 1: {ntwrk.displayLinesForward();
-                            break;
-                        }
-                        case 2: {
-                            boolean wrongLine = true;
-                            while(wrongLine){
-                                int lineNum;
-                                StdOut.println("Please enter line number. Enter -1 to go back.\n>");
-                                lineNum = StdIn.readInt();
-                                if(lineNum == -1) {
-                                    break;
-                                }
-                                if (ntwrk.lineNumbers.contains(lineNum)) {
-                                    for (Line l : ntwrk.lines) {
-                                        if (l.getLineNumber() == lineNum) {
-                                            l.traverseForward();
-                                        }
-                                    }
-                                    wrongLine = false;
-                                } else {
-                                    StdOut.println("The line number you entered doesn't exist.");
-                                }
-                            }
-                            break;
-                        }
-                        case 3: {
-                            StdOut.println("Station Information");
+         network = new Network();
+         stations = new Stations();
 
-                            break;
-                        }
-                        case 4: {
-                            StdOut.println("Shortest Path Information");
-                            break;
-                        }
-                        case 5: {
-                            StdOut.println("Return to Main Menu");
-                            break;
-                        }
-                        case 6: {
-                            StdOut.println("Exit");
-                            break;
-                        }
-                    }
-                }
-                case 2: {
-                    switch (editNetwork()) {
-                        case 1: {
-                            StdOut.println("Introduce new station");
-                            String name;
-                            int id;
-                            StdOut.println("Please enter the station name\n>");
-                            name = StdIn.readString();
-                            if(stns.mapStation(name) != -1) {
-                                StdOut.println("Please enter the station id\n>");
-                                id = StdIn.readInt();
-                                if(stns.mapStation(id) != null) {
-                                    if(stns.addStation(new Station(name, id)))
-                                        StdOut.println("Successfully added the new station.");
-                                    else
-                                        StdOut.println("Something is wrong.");
-                                }else {
-                                    StdOut.println("The station id already exits");
-                                }
-                            }else{
-                                StdOut.println("The station name already exits.");
-                            }
-                            break;
-                        }
-                        case 2: {
-                            StdOut.println("Change Station Name");
-                            String stnName;
-                            StdOut.println("Please enter the station name.\n>");
-                            stnName = StdIn.readString();
-                            int stnId = stns.mapStation(stnName);
-                            if( stnId == -1) {
-                                StdOut.println("This station doesn't exist");
-                                break;
-                            }else {
-                                StdOut.println("Please enter the new name");
-                                String newName = StdIn.readString();
-                                Station s = new Station(stnName, stnId);
-                                if(stns.deleteStation(s))
-                                    stns.addStation(new Station(newName, stnId));
-                                else
-                                    StdOut.println("Can't perform this operation.");
-                            }
-                            break;
-                        }
-                        case 3: {
-                            StdOut.println("Change Station Number");
-                            int stnId;
-                            StdOut.println("Please enter the station number.\n>");
-                            stnId = StdIn.readInt();
-                            String stnName = stns.mapStation(stnId);
-                            if( stnName == null) {
-                                StdOut.println("This station doesn't exist");
-                                break;
-                            }else {
-                                StdOut.println("Please enter the new number.\n>");
-                                int newId = StdIn.readInt();
-                                Station s = new Station(stnName, stnId);
-                                if(stns.deleteStation(s))
-                                    stns.addStation(new Station(stnName, newId));
-                                else
-                                    StdOut.println("Can't perform this operation.");
-                            }
-                            break;
-                        }
-                        case 4: {
-                            StdOut.println("Insert A New Station On A Line");
-                            int lineNumber;
-                            StdOut.println("Please enter the line number.\n>");
-                            lineNumber = StdIn.readInt();
-                            Line l = ntwrk.getLine(lineNumber);
-                            if(l != null) {
-                                int choice;
-                                StdOut.println("Press 1: To add an existing station.");
-                                StdOut.println("Press 2: To create an new station to add.");
-                                choice = StdIn.readInt();
-                                if(choice == 1) {
-                                    int stnNum;
-                                    StdOut.println("Please enter the station number.");
-                                    stnNum = StdIn.readInt();
-                                    Station s = stns.(stnNum);
+        try {
+            network.buildNetwork();
+            stations.buildStations();
 
-                                }
-                            }
-                            break;
-                        }
-                        case 5: {
-                            StdOut.println("Delete Station From Line");
-                            StdOut.println("Please enter the line number you want to edit.\n>");
-                            int lineId = StdIn.readInt();
-                            if(!ntwrk.lineNumbers.contains(lineId)) {
-                                StdOut.println("The line number you entered doesn't exist");
-                                break;
-                            }
-                            StdOut.println("Please enter the station number you want to delete.\n>");
-                            int stnId = StdIn.readInt();
-                            if(!stns.stnIds.contains(stnId)) {
-                                StdOut.println("The station doesn't exist");
-                                break;
-                            }
+            mainMenu();
 
-                            Line l = ntwrk.getLine(lineId);
-                            l.deleteStation(new StationData(stnId, l.))
-                            break;
-                        }
-                        case 6: {
-                            StdOut.println("Delete Station From Network");
-                            StdOut.println("Please enter the station number you want to delete.\n>");
-                            int stnId = StdIn.readInt();
-                            if(!stns.stnIds.contains(stnId)) {
-                                StdOut.println("The station doesn't exist");
-                                break;
-                            }
-                            Station s = stns.getStation(stnId);
-                            stns.deleteStation(s);
 
-                            break;
-                        }
-                        case 7: {
-                            StdOut.println("Introduce a new line");
-                            break;
-                        }
-                        case 8: {
-                            StdOut.println("Change Line Number");
-                            break;
-                        }
-                        case 9: {
-                            StdOut.println("Delete A line");
-                            break;
-                        }
-                        case 10: {
-                            StdOut.println("Network Changed. Save Changes.");
-                            break;
-                        }
-                        case 11: {
-                            StdOut.println("Undo All Changes.");
-                            break;
-                        }
-                        case 12: {
-                            StdOut.println("Back To Main Switch Board");
-                            break;
-                        }
-                        case 13: {
-                            StdOut.println("Exit");
-                            break;
-                        }
-                    }
-                }
-
-            }
-        }
-        if(ntwrk.updateNetworkFile()) {
-            StdOut.println("[!!] Can't update network file. some dependencies might be deleted")
+        }catch (FileNotFoundException e) {
+            StdOut.println("Can't find the important files exiting...");
         }
     }
 

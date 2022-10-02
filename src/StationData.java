@@ -7,7 +7,7 @@ public class StationData {
         this.distance = distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(float distance) {
         this.distance = distance;
     }
 

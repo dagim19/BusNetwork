@@ -107,4 +107,12 @@ public class Line {
     public StationData getStation(int index2) {
         return stationList.get(index2);
     }
+
+    public boolean changeDistance(StationData stn) {
+        int index = searchStation(stn.getStnId());
+        if (index == -1)
+            return false;
+        stationList.get(index).setDistance(stn.getDistance());
+        return true;
+    }
 }

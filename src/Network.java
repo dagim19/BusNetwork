@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +20,7 @@ public class Network {
         changed = false;
     }
 
-    public boolean buildNetwork() {
+    public void buildNetwork() throws FileNotFoundException {
         int nubLines;
         try {
             In in = new In(NETWORK_FILE_NAME);
@@ -39,10 +40,9 @@ public class Network {
                 lines.add(line);
             }
         }catch(IllegalArgumentException e) {
-            return false;
+            throw new FileNotFoundException("Error: " + e.getMessage());
         }
         this.nubLines = nubLines;
-        return true;
     }
 
     public boolean updateNetworkFile() {
@@ -83,7 +83,7 @@ public class Network {
         return -1;
     }
 
-    private int lineIndex(int lineNumber) {
+    public int lineIndex(int lineNumber) {
         for (int i = 0; i < nubLines; i++) {
             if (lines.get(i).getLineNumber() == lineNumber)
                 return i;
@@ -148,4 +148,25 @@ public class Network {
     }
 
 
+    public boolean changeLineNumber(int lineNumber, int newLineNumber) {
+        if (lineNumbers.contains(newLineNumber)) return false;
+        Line line = lines.get(lineIndex(lineNumber));
+        line.setLineNumber(newLineNumber);
+        lineNumbers.remove(lineNumber);
+        lineNumbers.add(newLineNumber);
+        changed = true;
+        return true;
+    }
+
+    public boolean undoChanges() {
+        if (changed) {
+            try {
+                buildNetwork();
+            }catch(FileNotFoundException e) {
+                return false;
+            }
+            changed = false;
+        }
+        return true;
+    }
 }

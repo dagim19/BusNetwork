@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -17,7 +18,7 @@ public class Stations {
         changed = false;
     }
 
-    boolean buildStations() {
+    void buildStations() throws FileNotFoundException {
         int numberOfStations;
         try {
             In in = new In(STATIONS_FILE_NAME);
@@ -29,10 +30,9 @@ public class Stations {
                 stationList.add(new Station(name, stationID));
             }
         }catch(IllegalArgumentException e) {
-            return false;
+            throw new FileNotFoundException("Error: " + e.getMessage());
         }
         this.numberOfStations = numberOfStations;
-        return true;
     }
 
     public int getNumberOfStations() {
@@ -43,6 +43,7 @@ public class Stations {
         if (stationList.add(station)) {
             numberOfStations++;
             changed = true;
+            stnIds.add(station.getStationID());
             return true;
         }
         return false;
@@ -73,7 +74,7 @@ public class Stations {
         return null;
     }
 
-    public void updateStnFile() {
+    boolean updateStnFile() {
         if (changed) {
             try {
                 Out out = new Out(STATIONS_FILE_NAME);
@@ -82,9 +83,38 @@ public class Stations {
                     out.println(s.getName() + " " + s.getStationID());
                 }
             }catch(IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                return false;
             }
+            changed = false;
         }
+        return true;
     }
 
+    public boolean changeStnId(int stnId, int newStnId) {
+        if (stnIds.contains(stnId)) {
+            for (Station s: stationList) {
+                if (s.getStationID() == stnId) {
+                    s.setStationID(newStnId);
+                    stnIds.remove(stnId);
+                    stnIds.add(newStnId);
+                    changed = true;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean undoChanges() {
+        if (changed) {
+            try {
+                buildStations();
+            }catch(FileNotFoundException e) {
+                return false;
+            }
+            changed = false;
+            return true;
+        }
+        return false;
+    }
 }
