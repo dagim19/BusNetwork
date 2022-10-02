@@ -31,7 +31,7 @@ public class Network {
                 Line line = new Line(lineNumber, numberOfStations);
                 for (int j = 0; j < numberOfStations; j++) {
                     int stnId = in.readInt();
-                    int distance = in.readInt();
+                    float distance = in.readFloat();
                     StationData stn = new StationData(stnId, distance);
                     line.addStation(stn);
                     if(j == 0) line.setStart(stn);
@@ -43,14 +43,6 @@ public class Network {
         }
         this.nubLines = nubLines;
         return true;
-    }
-
-    public int lineIndex(int lineNumber) {
-        for (int i = 0; i < nubLines; i++) {
-            if (lines.get(i).getLineNumber() == lineNumber)
-                return i;
-        }
-        return -1;
     }
 
     public boolean updateNetworkFile() {
@@ -70,67 +62,72 @@ public class Network {
         return true;
     }
 
-    public int noLinesPerStation(int stnId) {
+    // The function determine the number of lines passing through a station
+    public int noLinesPerStation(int stationID) {
         int count = 0;
         for (Line line: lines) {
-            if (line.searchStation(stnId) != -1)
-                count++;
+            if (line.containsStation(stationID)) count++;
         }
         return count;
     }
 
-    public Line getLine(int lineNumber) {
-        for(Line l: lines)
-            if(l.getLineNumber() == lineNumber)
-                return l;
-        return null;
-    }
-
-    public int LineThroughStations(int stnId1, int stnId2) {
+    // The function returns the first line, the second line and so on passing through a station controlled by the order value
+    public int LineThrStation(int stationID, int order) {
+        int count = 0;
         for (Line line: lines) {
-            if (line.searchStation(stnId1) != -1 && line.searchStation(stnId2) != -1)
-                return line.getLineNumber();
+            if (line.containsStation(stationID)) {
+                count++;
+                if (count == order) return line.getLineNumber();
+            }
         }
         return -1;
     }
 
-    public int directLine(int stnId1, int stnId2) {
-        for (Line line: lines) {
-            if (line.searchStation(stnId1) != -1 && line.searchStation(stnId2) != -1)
-                return line.getLineNumber();
+    private int lineIndex(int lineNumber) {
+        for (int i = 0; i < nubLines; i++) {
+            if (lines.get(i).getLineNumber() == lineNumber)
+                return i;
         }
         return -1;
     }
 
-    public void displayLinesForward() {
-        for (Line line: lines) {
-            line.traverseForward();
-            StdOut.println("===========================================");
-        }
+    // The function returns whether there is a direct line between two stations using a given line number/id
+    public boolean directLine(int stationID1, int stationID2, int lineNumber) {
+        Line line = lines.get(lineIndex(lineNumber));
+        return line.containsStation(stationID1) && line.containsStation(stationID2);
     }
 
-    public void displayLinesBackward() {
+
+    // The function returns the distance between two stations in terms of actual distance
+    public float distance(int stationID1, int stationID2) {
+        float distance = 0;
         for (Line line: lines) {
-            line.traverseBackward();
+            if (line.containsStation(stationID1) && line.containsStation(stationID2)) {
+                distance = line.distanceBetweenStations(stationID1, stationID2);
+                break;
+            }
         }
+        return distance;
     }
 
-    public float distance(int stnId1, int stnId2) {
-        int lineNo = LineThroughStations(stnId1, stnId2);
-        if (lineNo == -1)
-            return -1;
-        Line line = lines.get(lineIndex(lineNo));
-        int index1 = line.searchStation(stnId1);
-        int index2 = line.searchStation(stnId2);
-        if (index1 == -1 || index2 == -1)
-            return -1;
-        return line.getStation(index2).getDistance() - line.getStation(index1).getDistance();
+    // the function returns sub part of a line controlled by start station and destination station
+    public Line subLine(int lineNumber, int startStation, int destinationStation) {
+        Line line = lines.get(lineIndex(lineNumber));
+        Line subLine = new Line(lineNumber, 0);
+        boolean start = false;
+        for (StationData station: line.stationList) {
+            if (station.getStnId() == startStation) start = true;
+            if (start) subLine.addStation(station);
+            if (station.getStnId() == destinationStation) break;
+        }
+        return subLine;
     }
+
 
     // return the shortest path between two stations
     public List<StationData> shortestPath(int stnId1, int stnId2) {
         List<StationData> path = new ArrayList<StationData>();
-        int lineNo = LineThroughStations(stnId1, stnId2);
+        int lineNo = LineThrStation(stnId1, stnId2);
         if (lineNo == -1)
             return null;
         Line line = lines.get(lineIndex(lineNo));
@@ -149,10 +146,6 @@ public class Network {
         }
         return path;
     }
-
-
-
-
 
 
 }
