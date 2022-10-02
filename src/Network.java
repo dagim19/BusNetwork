@@ -105,6 +105,7 @@ public class Network {
     public void displayLinesForward() {
         for (Line line: lines) {
             line.traverseForward();
+            StdOut.println("===========================================");
         }
     }
 

@@ -1,180 +1,169 @@
-public class DList<T>{
-    private class Node{
-        private T data;
-        private Node next;
-        private Node prev;
-        public Node(T data, Node next, Node prev){
-            this.data = data;
-            this.next = next;
-            this.prev = prev;
-        }
+import java.util.Iterator;
+
+class Node<T>{
+    T data;
+    Node next;
+    Node prev;
+    public Node(T data, Node next, Node prev){
+        this.data = data;
+        this.next = next;
+        this.prev = prev;
     }
+}
 
-    private Node front;
-    private Node back;
-
+public class DList<T> implements Iterable<T>{
+    private Node<T> head;
+    private Node<T> tail;
+    private int size;
     public DList(){
-        front = null;
-        back = null;
+        head = new Node<T>(null, null, null);
+        tail = new Node<T>(null, null, head);
+        head.next = tail;
+        size = 0;
     }
-
+    public void addFirst(T data){
+        Node<T> newNode = new Node<T>(data, head.next, head);
+        head.next.prev = newNode;
+        head.next = newNode;
+        size++;
+    }
+    public void addLast(T data){
+        Node<T> newNode = new Node<T>(data, tail, tail.prev);
+        tail.prev.next = newNode;
+        tail.prev = newNode;
+        size++;
+    }
+    public T removeFirst(){
+        if(size == 0) return null;
+        Node<T> first = head.next;
+        head.next = first.next;
+        first.next.prev = head;
+        size--;
+        return first.data;
+    }
+    public T removeLast(){
+        if(size == 0) return null;
+        Node<T> last = tail.prev;
+        tail.prev = last.prev;
+        last.prev.next = tail;
+        size--;
+        return last.data;
+    }
+    public T getFirst(){
+        if(size == 0) return null;
+        return (T) head.next.data;
+    }
+    public T getLast(){
+        if(size == 0) return null;
+        return (T) tail.prev.data;
+    }
+    public int size(){
+        return size;
+    }
     public boolean isEmpty(){
-        return front == null;
+        return size == 0;
     }
 
-    public void insertFront(T data){
-        if (isEmpty()){
-            front = new Node(data, null, null);
-            back = front;
+    public Node<T> find(T data){
+        Node<T> current = head.next;
+        while(current != tail){
+            if(current.data.equals(data)) return current;
+            current = current.next;
         }
-        else{
-            front = new Node(data, front, null);
-            front.next.prev = front;
-        }
+        return null;
     }
 
-    public void insertBack(T data){
-        if (isEmpty()){
-            back = new Node(data, null, null);
-            front = back;
-        }
-        else{
-            back = new Node(data, null, back);
-            back.prev.next = back;
-        }
+    public void insertBefore(Node<T> before, Node<T> after) {
+        Node<T> newNode = new Node<T>(before.data, after, after.prev);
+        after.prev.next = newNode;
+        after.prev = newNode;
+        size++;
     }
 
-    public boolean removeFront(){
-        if (isEmpty()){
-            return false;
-        }
-        else if (front == back){
-            front = null;
-            back = null;
-            return true;
-        }
-        else{
-            front = front.next;
-            front.prev = null;
-            return true;
-        }
+    public void insertAfter(Node<T> after, Node<T> before) {
+        Node<T> newNode = new Node<T>(before.data, after.next, after);
+        after.next.prev = newNode;
+        after.next = newNode;
+        size++;
     }
 
-    public boolean removeBack() {
-        if (isEmpty()) {
-            return false;
-        }
-        else if (front == back) {
-            front = null;
-            back = null;
-            return true;
-        }
-        else {
-            back = back.prev;
-            back.next = null;
-            return true;
-        }
+   public int removeBefore(Node<T> before) {
+        if(before.prev == head) return -1;
+        Node<T> current = before.prev;
+        before.prev = current.prev;
+        current.prev.next = before;
+        size--;
+        return 0;
     }
 
-    public void insertAfter(T data, T key){
-        Node temp = front;
-        while (temp != null && !temp.data.equals(key)){
-            temp = temp.next;
-        }
-        if (temp == null){
-            return;
-        }
-        else if (temp == back){
-            insertBack(data);
-        }
-        else{
-            Node newNode = new Node(data, temp.next, temp);
-            temp.next.prev = newNode;
-            temp.next = newNode;
+    public int removeAfter(Node<T> after) {
+        if(after.next == tail) return -1;
+        Node<T> current = after.next;
+        after.next = current.next;
+        current.next.prev = after;
+        size--;
+        return 0;
+    }
+
+    public void insertRangeBefore(Node<T> before, DList<T> list) {
+        if(list.size == 0) return;
+        Node<T> current = list.head.next;
+        while(current != list.tail){
+            Node<T> newNode = new Node<T>(current.data, before, before.prev);
+            before.prev.next = newNode;
+            before.prev = newNode;
+            size++;
+            current = current.next;
         }
     }
 
-    public void insertBefore(T data, T key){
-        Node temp = front;
-        while (temp != null && !temp.data.equals(key)){
-            temp = temp.next;
-        }
-        if (temp == null){
-            return;
-        }
-        else if (temp == front){
-            insertFront(data);
-        }
-        else{
-            Node newNode = new Node(data, temp, temp.prev);
-            temp.prev.next = newNode;
-            temp.prev = newNode;
+    public void insertRangeAfter(Node<T> after, DList<T> list) {
+        if(list.size == 0) return;
+        Node<T> current = list.tail.prev;
+        while(current != list.head){
+            Node<T> newNode = new Node<T>(current.data, after.next, after);
+            after.next.prev = newNode;
+            after.next = newNode;
+            size++;
+            current = current.prev;
         }
     }
 
-    public boolean removeBefore(T key){
-        Node temp = front;
-        while (temp != null && !temp.data.equals(key)){
-            temp = temp.next;
-        }
-        if (temp == null || temp == front){
-            return false;
-        }
-        else if (temp.prev == front){
-            removeFront();
-            return true;
-        }
-        else{
-            temp.prev.prev.next = temp;
-            temp.prev = temp.prev.prev;
-            return true;
+    public void removeRange(Node<T> start, Node<T> end) {
+        if(start == end) return;
+        Node<T> current = start;
+        while(current != end){
+            Node<T> temp = current.next;
+            current.prev.next = current.next;
+            current.next.prev = current.prev;
+            size--;
+            current = temp;
         }
     }
 
-    public boolean removeAfter(T key) {
-        Node temp = front;
-        while (temp != null && !temp.data.equals(key)) {
-            temp = temp.next;
+    public DList<T> getSublist(Node<T> rangeFirst, Node<T> rangeLast) {
+        DList<T> list = new DList<T>();
+        Node<T> current = rangeFirst;
+        while(current != rangeLast){
+            list.addLast(current.data);
+            current = current.next;
         }
-        if (temp == null || temp == back) {
-            return false;
-        }
-        else if (temp.next == back) {
-            removeBack();
-            return true;
-        }
-        else {
-            temp.next.next.prev = temp;
-            temp.next = temp.next.next;
-            return true;
-        }
-    }
-
-    // find function
-    public boolean find(T key){
-        Node temp = front;
-        while (temp != null && !temp.data.equals(key)){
-            temp = temp.next;
-        }
-        if (temp == null){
-            return false;
-        }
-        return true;
-    }
-
-    public void insertRangeBefore(T data, T key1, T key2){
-        Node temp = front;
-        while (temp != null && !temp.data.equals(key1)){
-            temp = temp.next;
-        }
-        if (temp == null){
-            return;
-        }
-        while (temp != null && !temp.data.equals(key2)){
-            insertBefore(data, temp.data);
-            temp = temp.next;
-        }
+        return list;
     }
 
 
+    public Iterator<T> iterator(){
+        return new DListIterator();
+    }
+    private class DListIterator implements Iterator<T>{
+        private Node<T> current = head.next;
+        public boolean hasNext(){
+            return current != tail;
+        }
+        public T next(){
+            T data = current.data;
+            current = current.next;
+            return data;
+        }
+    }
 }

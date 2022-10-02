@@ -231,6 +231,15 @@ public class App {
                         }
                         case 6: {
                             StdOut.println("Delete Station From Network");
+                            StdOut.println("Please enter the station number you want to delete.\n>");
+                            int stnId = StdIn.readInt();
+                            if(!stns.stnIds.contains(stnId)) {
+                                StdOut.println("The station doesn't exist");
+                                break;
+                            }
+                            Station s = stns.getStation(stnId);
+                            stns.deleteStation(s);
+
                             break;
                         }
                         case 7: {
