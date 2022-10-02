@@ -4,7 +4,7 @@ public class Line {
     private int lineNumber;
     private int numberOfStations;
     private StationData start;
-    private ArrayList<StationData> stationList;
+    ArrayList<StationData> stationList;
 
     // constructor
     public Line(int lineNumber, int numberOfStations) {
@@ -76,6 +76,33 @@ public class Line {
         }
         return -1;
     }
+
+    public boolean containsStation(int stnId) {
+        for (StationData s: stationList) {
+            if (s.getStnId() == stnId)
+                return true;
+        }
+        return false;
+    }
+
+    public float distanceBetweenStations(int stnId1, int stnId2) {
+        int index1 = searchStation(stnId1);
+        int index2 = searchStation(stnId2);
+        if (index1 == -1 || index2 == -1)
+            return -1;
+        if (index1 > index2) {
+            int temp = index1;
+            index1 = index2;
+            index2 = temp;
+        }
+        float distance = 0;
+        for (int i = index1; i < index2; i++) {
+            distance += stationList.get(i).getDistance();
+        }
+        return distance;
+    }
+
+
 
     public StationData getStation(int index2) {
         return stationList.get(index2);
