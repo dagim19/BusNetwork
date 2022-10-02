@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class App {
 
@@ -329,6 +330,157 @@ public class App {
         }while(choice < 1 || choice > 8 || choice != 8);
     }
 
+    private static int networkInfoChoice() {
+        int choice;
+        clear();
+        StdOut.println("Network Information");
+        StdOut.println("Press 1: All Network Information");
+        StdOut.println("Press 2: Line Information");
+        StdOut.println("Press 3: Station Information");
+        StdOut.println("Press 4: Shortest path Information");
+        StdOut.println("Press 5: Back to menu");
+        StdOut.print(">");
+        return StdIn.readInt();
+    }
+
+    private static void handleInfo() {
+        int choice;
+
+        do {
+            choice = networkInfoChoice();
+            if(choice < 1 || choice > 6) {
+                StdOut.println("You entered an invalid choice...");
+                continue;
+            }
+
+            switch (choice) {
+                case 1:
+                {
+                    clear();
+                    StdOut.println("Network Information");
+                    StdOut.println("There are " + network.nubLines + " lines in the network.");
+                    StdOut.println("========================================");
+                    StdOut.println("Line Number\tNumber of Stations");
+                    StdOut.println("========================================");
+                    for (Line line: network.lines) {
+                        StdOut.println(line.getLineNumber() + "\t\t" + line.getNumberOfStations());
+                    }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readChar();
+                }
+                break;
+                case 2:
+                {
+                    clear();
+                    StdOut.println("Line Information");
+                    StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
+                    int lineNumber = StdIn.readInt();
+
+                    do {
+                        if(!network.lineNumbers.contains(lineNumber)) {
+                            StdOut.println("The line number you entered does not exist. Please enter a valid line number.\n>");
+                            lineNumber = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!network.lineNumbers.contains(lineNumber));
+
+                    if(lineNumber == -1)
+                        break;
+
+                    StdOut.println("========================================");
+                    StdOut.println("Line Number\tNumber of Stations");
+                    StdOut.println("========================================");
+                    StdOut.println(network.lines.get(network.lineIndex(lineNumber)).getLineNumber() + "\t\t" + network.lines.get(network.lineIndex(lineNumber)).getNumberOfStations());
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readChar();
+                }
+                break;
+                case 3:
+                {
+                    clear();
+                    StdOut.println("Station Information");
+                    StdOut.println("Enter the station number. (Enter -1 to abort)\n>");
+                    int stnId = StdIn.readInt();
+
+                    do {
+                        if(!stations.stnIds.contains(stnId)) {
+                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            stnId = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!stations.stnIds.contains(stnId) && stnId != -1);
+
+                    if(stnId == -1)
+                        break;
+
+                    StdOut.println("========================================");
+                    StdOut.println("Station Number\tStation Name");
+                    StdOut.println("========================================");
+                    StdOut.println(stnId + "\t\t" + stations.mapStation(stnId));
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readChar();
+                }
+                break;
+                case 4:
+                {
+                    clear();
+                    StdOut.println("Shortest Path Information");
+                    StdOut.println("Enter the station number of the source station. (Enter -1 to abort)\n>");
+                    int sourceStnId = StdIn.readInt();
+
+                    do {
+                        if(!stations.stnIds.contains(sourceStnId)) {
+                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            sourceStnId = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!stations.stnIds.contains(sourceStnId) && sourceStnId != -1);
+
+                    if(sourceStnId == -1)
+                        break;
+
+                    StdOut.println("Enter the station number of the destination station. (Enter -1 to abort)\n>");
+                    int destStnId = StdIn.readInt();
+
+                    do {
+                        if(!stations.stnIds.contains(destStnId)) {
+                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            destStnId = StdIn.readInt();
+                        }
+                        else break;
+                    }while(!stations.stnIds.contains(destStnId) && destStnId != -1);
+
+                    if(destStnId == -1)
+                        break;
+
+                    StdOut.println("========================================");
+                    StdOut.println("Shortest Path");
+                    StdOut.println("========================================");
+//                    StdOut.println(sourceStnId + "\t\t" + destStnId + "\t\t" + network.shortestPath(sourceStnId, destStnId));
+                    ArrayList<StationData> path = (ArrayList<StationData>) network.shortestPath(sourceStnId, destStnId);
+                    for(StationData stationData: path) {
+                        StdOut.print(stations.mapStation(stationData.getStnId()) + " (" + stationData.getStnId() + ") -> ");
+                    }
+                    StdOut.println("END");
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readChar();
+                }
+                break;
+                case 5:
+                {
+                    clear();
+                    return;
+                }
+                case 6:
+                {
+                    clear();
+                    System.exit(0);
+                }
+                break;
+            }
+        }while(choice < 1 || choice > 6 || choice != 6);
+    }
+
 
     private static int menuChoice() {
         int choice;
@@ -359,16 +511,7 @@ public class App {
                 case 1:
                 {
                     clear();
-                    StdOut.println("Network Information");
-                    StdOut.println("There are " + network.nubLines + " lines in the network.");
-                    StdOut.println("========================================");
-                    StdOut.println("Line Number\tNumber of Stations");
-                    StdOut.println("========================================");
-                    for (Line line: network.lines) {
-                        StdOut.println(line.getLineNumber() + "\t\t" + line.getNumberOfStations());
-                    }
-                    StdOut.println("Press any key to continue...");
-                    StdIn.readChar();
+                    handleInfo();
                 }
                 break;
                 case 2:
