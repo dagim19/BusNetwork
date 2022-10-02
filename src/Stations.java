@@ -24,8 +24,8 @@ public class Stations {
             In in = new In(STATIONS_FILE_NAME);
             numberOfStations = in.readInt();
             for (int i = 0; i < numberOfStations; i++) {
-                String name = in.readString();
                 int stationID = in.readInt();
+                String name = in.readString();
                 stnIds.add(stationID);
                 stationList.add(new Station(name, stationID));
             }
