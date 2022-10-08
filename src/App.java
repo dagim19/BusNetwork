@@ -292,7 +292,7 @@ public class App {
                     clear();
 
                     StdOut.println("Update the Station-ID of a station");
-                    StdOut.println("Enter the existing Station-ID. (Enter -1 to abort)\n>");
+                    StdOut.println("Enter existing Station-ID. (Enter -1 to abort)\n>");
                     int stnId = StdIn.readInt();
 
                     do {
