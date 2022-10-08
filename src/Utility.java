@@ -63,9 +63,11 @@ public class Utility {
 
             In users = new In(".users.txt");
             StdOut.println("Welcome to Addis Ababa Bus Network System");
-            StdOut.println("Please enter your username\n>");
+            StdOut.println("Please enter your username");
+            StdOut.print("> ");
             String username = StdIn.readLine();
-            StdOut.println("Please enter your password\n>");
+            StdOut.println("Please enter your password.");
+            StdOut.print("> ");
             String password = StdIn.readLine();
 
             while (users.hasNextLine()) {

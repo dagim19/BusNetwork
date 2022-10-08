@@ -113,7 +113,7 @@ public class App {
 
         do {
             choice = editChoice();
-            if(choice < 1 || choice > 8) {
+            if(choice < 1 || choice > 9) {
                 StdOut.println("You entered an invalid choice...");
                 continue;
             }
@@ -386,7 +386,8 @@ public class App {
                 case 9:
                 {
                     Utility.clear();
-                    break;
+                    // return to main menu
+                    return;
                 }
             }
         }while(choice > 0 && choice < 9);
@@ -627,7 +628,7 @@ public class App {
                 }
                 break;
             }
-        }while (choice < 1 || choice > 5);
+        }while (!(choice < 1 || choice > 5));
     }
 
 
