@@ -64,6 +64,15 @@ public class DList<T> implements Iterable<T>{
         return size == 0;
     }
 
+    public T get(int index){
+        if(index < 0 || index >= size) return null;
+        Node<T> current = head.next;
+        for(int i = 0; i < index; i++){
+            current = current.next;
+        }
+        return current.data;
+    }
+
     public Node<T> find(T data){
         Node<T> current = head.next;
         while(current != tail){

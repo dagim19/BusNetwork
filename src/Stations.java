@@ -11,7 +11,7 @@ public class Stations {
     HashSet<Integer> stnIds;
 
     public Stations() {
-        stationList = new ArrayList<Station>();
+        stationList = new ArrayList<>();
         stnIds = new HashSet<>();
         numberOfStations = 0;
         avail = 0;

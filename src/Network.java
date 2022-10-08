@@ -13,7 +13,7 @@ public class Network {
     HashSet<Integer> lineNumbers;
 
     public Network() {
-        lines = new ArrayList<Line>();
+        lines = new ArrayList<>();
         lineNumbers = new HashSet<>();
         nubLines = 0;
         avail = 0;
