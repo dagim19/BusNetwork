@@ -1,5 +1,3 @@
-import java.awt.*;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class App {
@@ -7,16 +5,9 @@ public class App {
     static Network network;
     static Stations stations;
 
-    private static void clear() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
-
-
     private static int editChoice() {
         int choice;
-        clear();
+        Utility.clear();
         StdOut.println("What do you want to do?");
         StdOut.println("Press 1: Add a new line");
         StdOut.println("Press 2: Add a new station to an existing line");
@@ -25,10 +16,96 @@ public class App {
         StdOut.println("Press 5: Change the distance between two stations");
         StdOut.println("Press 6: Change the line number of a line");
         StdOut.println("Press 7: Change the station number of a station");
-        StdOut.println("Press 8: Return to main menu");
-        StdOut.print(">");
+        StdOut.println("Press 8: Handle user information.");
+        StdOut.println("Press 9: Return to main menu");
+        StdOut.print("> ");
         choice = StdIn.readInt();
         return choice;
+    }
+
+    private static int editUserChoice() {
+        int chioce;
+        Utility.clear();
+        StdOut.println("What do you want to do?");
+        StdOut.println("Press 1: Add a new user");
+        StdOut.println("Press 2: Remove a user");
+        StdOut.println("Press 3: Change a user's password");
+        StdOut.println("Press 4: Change a user's admin status");
+        StdOut.println("Press 5: Return to main menu");
+        StdOut.print("> ");
+        chioce = StdIn.readInt();
+        return chioce;
+    }
+
+    private static void handleUserEdit() {
+        int choice = editUserChoice();
+        switch (choice) {
+            case 1:
+                Utility.clear();
+                StdOut.println("Enter the username of the new user");
+                StdOut.print("> ");
+                String username = StdIn.readLine();
+                StdOut.println("Enter the password of the new user");
+                StdOut.print("> ");
+                String password = StdIn.readLine();
+                StdOut.println("Is the new user an admin? (y/n)");
+                StdOut.print("> ");
+                boolean isAdmin = StdIn.readLine().equals("y");
+                User user = new User(username, password, isAdmin);
+                if (Utility.saveUser(user)) {
+                    StdOut.println("User created successfully.");
+                } else {
+                    StdOut.println("User creation failed.");
+                }
+                break;
+            case 2:
+                Utility.clear();
+                StdOut.println("Enter the username of the user to be removed");
+                StdOut.print("> ");
+                username = StdIn.readLine();
+                if (Utility.removeUser(username)) {
+                    StdOut.println("User removed successfully.");
+                } else {
+                    StdOut.println("User removal failed.");
+                }
+                break;
+            case 3:
+                Utility.clear();
+                StdOut.println("Enter the username of the user whose password is to be changed");
+                StdOut.print("> ");
+                username = StdIn.readLine();
+                StdOut.println("Enter the new password");
+                StdOut.print("> ");
+                password = StdIn.readLine();
+                if (Utility.changePassword(username, password)) {
+                    StdOut.println("Password changed successfully.");
+                } else {
+                    StdOut.println("Password change failed.");
+                }
+                break;
+            case 4:
+                Utility.clear();
+                StdOut.println("Enter the username of the user whose admin status is to be changed");
+                StdOut.print("> ");
+                username = StdIn.readLine();
+                StdOut.println("Is the user an admin? (y/n)");
+                StdOut.print("> ");
+                isAdmin = StdIn.readLine().equals("y");
+                if (Utility.changeAdminStatus(username, isAdmin)) {
+                    StdOut.println("Admin status changed successfully.");
+                } else {
+                    StdOut.println("Admin status change failed.");
+                }
+                break;
+            case 5:
+                return;
+            default:
+                StdOut.println("Invalid choice.");
+                break;
+        }
+        Utility.clear();
+        StdOut.println("Press any key to continue...");
+        StdIn.readLine();
     }
 
     private static void handleEdit() {
@@ -44,7 +121,7 @@ public class App {
             switch (choice) {
                 case 1:
                 {
-                   clear();
+                   Utility.clear();
                    StdOut.println("Enter New Line");
                    int lineNumber;
                    do {
@@ -83,19 +160,16 @@ public class App {
                    if (network.lines.add(line)) {
                        network.lineNumbers.add(lineNumber);
                        StdOut.println("Successfully added the new line in the network");
-                       StdOut.println("Press any key to continue...");
-                       StdIn.readString();
                    }else{
                           StdOut.println("Failed to add the new line in the network");
-                          StdOut.println("Press any key to continue...");
-                          StdIn.readString();
                    }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 2:
                 {
-                    // add new station to an existing station.
-                    clear();
+                    Utility.clear();
                     StdOut.println("Enter a new station to an existing line.");
                     StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
@@ -124,19 +198,16 @@ public class App {
                     StationData stn = new StationData(stnId, distance);
                     if(network.lines.get(network.lineIndex(lineNumber)).addStation(stn)) {
                         StdOut.println("Successfully added the new station");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }else{
                         StdOut.println("Failed to add the new station");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 3:
                 {
-                    // remove a line
-                    clear();
+                    Utility.clear();
                     StdOut.println("Remove a line from the network");
                     StdOut.println("Enter the line number to remove. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
@@ -154,18 +225,16 @@ public class App {
                     if(network.lines.remove(network.lines.get(network.lineIndex(lineNumber)))) {
                         network.lineNumbers.remove(network.lineIndex(lineNumber));
                         StdOut.println("Successfully removed the line");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }else{
                         StdOut.println("Failed to remove the line");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 4:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Remove a station from a line");
                     StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
@@ -198,19 +267,16 @@ public class App {
                     StationData stn = new StationData(stnId, distance);
                     if(network.lines.get(network.lineIndex(lineNumber)).deleteStation(stn)) {
                        StdOut.println("Successfully removed the station");
-                       StdOut.println("Press any key to continue...");
-                       StdIn.readString();
                     }else{
                         StdOut.println("Failed to delete the station");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 5:
                 {
-                    // change the distance between two stations
-                    clear();
+                    Utility.clear();
                     StdOut.println("Change the distance between two stations");
                     StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
@@ -244,19 +310,16 @@ public class App {
                     StationData stn = new StationData(stnId, distance);
                     if(network.lines.get(network.lineIndex(lineNumber)).changeDistance(stn)) {
                        StdOut.println("Successfully changed the distance");
-                       StdOut.println("Press any key to continue...");
-                       StdIn.readString();
                     }else {
                         StdOut.println("Failed to change the distance");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 6:
                 {
-                    // Change the line number of a line
-                    clear();
+                    Utility.clear();
                     StdOut.println("Change the line number of a line");
                     StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
@@ -277,20 +340,16 @@ public class App {
 
                     if(network.changeLineNumber(lineNumber, newLineNumber)) {
                         StdOut.println("Successfully changed the line number");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }else {
                         StdOut.println("Failed to change the line number");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 7:
                 {
-                    // Change the station number of a station
-                    clear();
-
+                    Utility.clear();
                     StdOut.println("Change the station number of a station");
                     StdOut.println("Enter the station number. (Enter -1 to abort)\n>");
                     int stnId = StdIn.readInt();
@@ -311,28 +370,31 @@ public class App {
 
                     if(stations.changeStnId(stnId, newStnId)) {
                         StdOut.println("Successfully changed the station number");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }else{
                         StdOut.println("Failed to change the station number");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 8:
                 {
-                    // back to main menu
-                    clear();
-                    return;
+                    Utility.clear();
+                    handleUserEdit();
+                }
+                break;
+                case 9:
+                {
+                    Utility.clear();
+                    break;
                 }
             }
-        }while(choice < 1 || choice > 8 || choice != 8);
+        }while(choice < 1 || choice > 9 || choice != 9);
     }
 
     private static int networkInfoChoice() {
         int choice;
-        clear();
+        Utility.clear();
         StdOut.println("Network Information");
         StdOut.println("Press 1: All Network Information");
         StdOut.println("Press 2: Line Information");
@@ -356,7 +418,7 @@ public class App {
             switch (choice) {
                 case 1:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Network Information");
                     StdOut.println("There are " + network.nubLines + " lines in the network.");
                     StdOut.println("========================================");
@@ -371,7 +433,7 @@ public class App {
                 break;
                 case 2:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Line Information");
                     StdOut.println("Enter the Line-ID. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
@@ -397,7 +459,7 @@ public class App {
                 break;
                 case 3:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Station Information");
                     StdOut.println("Enter the Station-ID. (Enter -1 to abort)\n>");
                     int stnId = StdIn.readInt();
@@ -423,7 +485,7 @@ public class App {
                 break;
                 case 4:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Shortest Path Information");
                     StdOut.println("Enter the Station-ID of the source station. (Enter -1 to abort)\n>");
                     int sourceStnId = StdIn.readInt();
@@ -456,7 +518,6 @@ public class App {
                     StdOut.println("========================================");
                     StdOut.println("Shortest Path");
                     StdOut.println("========================================");
-//                    StdOut.println(sourceStnId + "\t\t" + destStnId + "\t\t" + network.shortestPath(sourceStnId, destStnId));
                     ArrayList<StationData> path = (ArrayList<StationData>) network.shortestPath(sourceStnId, destStnId);
                     for(StationData stationData: path) {
                         StdOut.print(stations.mapStation(stationData.getStnId()) + " (" + stationData.getStnId() + ") -> ");
@@ -468,12 +529,12 @@ public class App {
                 break;
                 case 5:
                 {
-                    clear();
+                    Utility.clear();
                     return;
                 }
                 case 6:
                 {
-                    clear();
+                    Utility.clear();
                     System.exit(0);
                 }
                 break;
@@ -510,49 +571,52 @@ public class App {
             switch (choice) {
                 case 1:
                 {
-                    clear();
+                    Utility.clear();
                     handleInfo();
                 }
                 break;
                 case 2:
                 {
-                    clear();
+                    if(!Utility.isCurrentUserAdmin()) {
+                        Utility.clear();
+                        StdOut.println("You are not authorized to perform this operation.");
+                        StdOut.println("Press any key to continue...");
+                        StdIn.readChar();
+                        break;
+                    }
+                    Utility.clear();
                     handleEdit();
                 }
                 break;
                 case 3:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Saving changes...");
                     if (network.updateNetworkFile() && stations.updateStnFile()){
                         StdOut.println("Successfully saved changes");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }else {
                         StdOut.println("Failed to save changes");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 4:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Undoing all changes...");
                     if(network.undoChanges() && stations.undoChanges()) {
                         StdOut.println("Successfully undone all changes");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }else {
                         StdOut.println("Failed to undo all changes");
-                        StdOut.println("Press any key to continue...");
-                        StdIn.readString();
                     }
+                    StdOut.println("Press any key to continue...");
+                    StdIn.readString();
                 }
                 break;
                 case 5:
                 {
-                    clear();
+                    Utility.clear();
                     StdOut.println("Exiting...");
                     StdOut.println("Press any key to continue...");
                     StdIn.readString();
@@ -565,18 +629,19 @@ public class App {
 
 
     public static void main(String[] args) {
-         network = new Network();
-         stations = new Stations();
+        network = new Network();
+        stations = new Stations();
 
-        try {
-            network.buildNetwork();
-            stations.buildStations();
-
+        Utility.clear();
+        if(Utility.initializeApp()) {
+            Utility.clear();
             mainMenu();
-
-
-        }catch (FileNotFoundException e) {
-            StdOut.println("Can't find the important files exiting...");
+        }else{
+            Utility.clear();
+            StdOut.println("Failed to initialize application. Exiting...");
+            StdOut.println("Press any key to continue...");
+            StdIn.readString();
+            System.exit(0);
         }
     }
 

@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Network {
-    private final String NETWORK_FILE_NAME = "network.txt";
-    int nubLines;
+    private final static String NETWORK_FILE_NAME = "network.txt";
+    static int nubLines;
     int avail;
     boolean changed;
 
-    DList<Line> lines;
-    HashSet<Integer> lineNumbers;
+    static DList<Line> lines;
+    static HashSet<Integer> lineNumbers;
 
     public Network() {
         lines = new DList<>();
@@ -20,8 +20,8 @@ public class Network {
         changed = false;
     }
 
-    public void buildNetwork() throws FileNotFoundException {
-        int nubLines;
+    public static void buildNetwork(){
+
         try {
             In in = new In(NETWORK_FILE_NAME);
             nubLines = in.readInt();
@@ -39,10 +39,13 @@ public class Network {
                 }
                 lines.add(line);
             }
+
         }catch(IllegalArgumentException e) {
-            throw new FileNotFoundException("Error: " + e.getMessage());
+            Out out = new Out(NETWORK_FILE_NAME);
+            out.println("0");
+            out.close();
+            buildNetwork();
         }
-        this.nubLines = nubLines;
     }
 
     public boolean updateNetworkFile() {
@@ -160,11 +163,7 @@ public class Network {
 
     public boolean undoChanges() {
         if (changed) {
-            try {
-                buildNetwork();
-            }catch(FileNotFoundException e) {
-                return false;
-            }
+            buildNetwork();
             changed = false;
         }
         return true;

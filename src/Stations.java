@@ -3,12 +3,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Stations {
-    private final String STATIONS_FILE_NAME = "stations.txt";
-    private int numberOfStations;
+    private final static String STATIONS_FILE_NAME = "stations.txt";
+    private static int numberOfStations;
     private int avail;
     private boolean changed;
-    private DList<Station> stationList;
-    HashSet<Integer> stnIds;
+    private static DList<Station> stationList;
+    static HashSet<Integer> stnIds;
 
     public Stations() {
         stationList = new DList<>();
@@ -18,8 +18,7 @@ public class Stations {
         changed = false;
     }
 
-    void buildStations() throws FileNotFoundException {
-        int numberOfStations;
+    static void buildStations() {
         try {
             In in = new In(STATIONS_FILE_NAME);
             numberOfStations = in.readInt();
@@ -30,9 +29,11 @@ public class Stations {
                 stationList.add(new Station(name, stationID));
             }
         }catch(IllegalArgumentException e) {
-            throw new FileNotFoundException("Error: " + e.getMessage());
+            Out out = new Out(STATIONS_FILE_NAME);
+            out.println("0");
+            out.close();
+            buildStations();
         }
-        this.numberOfStations = numberOfStations;
     }
 
     public int getNumberOfStations() {
@@ -107,11 +108,7 @@ public class Stations {
 
     public boolean undoChanges() {
         if (changed) {
-            try {
-                buildStations();
-            }catch(FileNotFoundException e) {
-                return false;
-            }
+            buildStations();
             changed = false;
             return true;
         }

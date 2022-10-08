@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class Utility {
 
-    // the current logged in user
     private static User currentUser;
 
     public static String getHash(String input) {
@@ -21,6 +20,10 @@ public class Utility {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static User getCurrentUser() {
+        return currentUser;
     }
 
     public static String getHash(String input, String salt) {
@@ -39,18 +42,24 @@ public class Utility {
         return getHash(String.valueOf(System.currentTimeMillis()));
     }
 
-    public static void saveUser(User user) {
+    public static boolean saveUser(User user) {
         String salt = getSalt();
         String hash = getHash(user.getPassword(), salt);
         Out out = new Out(".users.txt");
+        // check if the user already exists
+        In in = new In(".users.txt");
+        while (!in.isEmpty()) {
+            String[] line = in.readLine().split(" ");
+            if (line[0].equals(user.getUsername())) {
+                return false;
+            }
+        }
         out.println(user.getUsername() + " " + salt + " " + hash + " " + user.isAdmin());
+        return true;
     }
 
     public static boolean initializeApp() {
         try {
-            File file = new File(".users.txt");
-            if(!file.setWritable(true))
-                return false;
 
             In users = new In(".users.txt");
             StdOut.println("Welcome to Addis Ababa Bus Network System");
@@ -64,11 +73,7 @@ public class Utility {
                 if (user[0].equals(username)) {
                     if (checkHash(password, user[1], user[2])) {
                         currentUser = new User(user[0], user[2], Boolean.parseBoolean(user[3]));
-                        if (new File("stations.txt").exists() && new File("users.txt").exists()) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return true;
                     } else {
                         return false;
                     }
@@ -85,13 +90,69 @@ public class Utility {
             saveUser(user);
             StdOut.println("User created successfully.");
             currentUser = user;
-            File file = new File(".users.txt");
+            Network.buildNetwork();
+            Stations.buildStations();
 
-            if(!file.setReadOnly())
-                StdOut.println("The file can't be set to read only, please do it manually. To prevent unauthorized access to the file.");
             return true;
         }
         return false;
     }
 
+    public static void clear() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public static boolean isCurrentUserAdmin() {
+        return currentUser.isAdmin();
+    }
+
+    public static boolean changeAdminStatus(String username, boolean isAdmin) {
+        if (isCurrentUserAdmin()) {
+            In in = new In(".users.txt");
+            Out out = new Out(".users.txt");
+            while (!in.isEmpty()) {
+                String[] line = in.readLine().split(" ");
+                if (line[0].equals(username)) {
+                    out.println(line[0] + " " + line[1] + " " + line[2] + " " + isAdmin);
+                } else {
+                    out.println(line[0] + " " + line[1] + " " + line[2] + " " + line[3]);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean changePassword(String username, String password) {
+        if (isCurrentUserAdmin()) {
+            In in = new In(".users.txt");
+            Out out = new Out(".users.txt");
+            while (!in.isEmpty()) {
+                String[] line = in.readLine().split(" ");
+                if (line[0].equals(username)) {
+                    out.println(line[0] + " " + line[1] + " " + getHash(password, line[1]) + " " + line[3]);
+                } else {
+                    out.println(line[0] + " " + line[1] + " " + line[2] + " " + line[3]);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean removeUser(String username) {
+        if (isCurrentUserAdmin()) {
+            In in = new In(".users.txt");
+            Out out = new Out(".users.txt");
+            while (!in.isEmpty()) {
+                String[] line = in.readLine().split(" ");
+                if (!line[0].equals(username)) {
+                    out.println(line[0] + " " + line[1] + " " + line[2] + " " + line[3]);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }
