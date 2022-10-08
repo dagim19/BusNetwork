@@ -9,11 +9,11 @@ public class Network {
     int avail;
     boolean changed;
 
-    ArrayList<Line> lines;
+    DList<Line> lines;
     HashSet<Integer> lineNumbers;
 
     public Network() {
-        lines = new ArrayList<>();
+        lines = new DList<>();
         lineNumbers = new HashSet<>();
         nubLines = 0;
         avail = 0;

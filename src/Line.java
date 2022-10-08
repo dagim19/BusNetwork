@@ -4,13 +4,13 @@ public class Line {
     private int lineNumber;
     private int numberOfStations;
     private StationData start;
-    ArrayList<StationData> stationList;
+    DList<StationData> stationList;
 
     // constructor
     public Line(int lineNumber, int numberOfStations) {
         this.lineNumber = lineNumber;
         this.numberOfStations = numberOfStations;
-        stationList = new ArrayList<StationData>();
+        stationList = new DList<StationData>();
         start = null;
     }
 
@@ -36,6 +36,10 @@ public class Line {
 
     public void setStart(StationData start) {
         this.start = start;
+    }
+
+    public boolean equals(Line line) {
+        return this.lineNumber == line.lineNumber;
     }
 
     public boolean addStation(StationData station) {
@@ -64,8 +68,8 @@ public class Line {
 
     // traverse backward
     public void traverseBackward() {
-        for (int i = stationList.size() - 1; i >= 0; i--) {
-            StdOut.println(stationList.get(i).getStnId() + " " + stationList.get(i).getDistance());
+        for (StationData stationData: stationList.backwards()) {
+            StdOut.println(stationData.getStnId() + " " + stationData.getDistance());
         }
     }
 

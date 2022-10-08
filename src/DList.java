@@ -15,6 +15,7 @@ public class DList<T> implements Iterable<T>{
     private Node<T> head;
     private Node<T> tail;
     private int size;
+
     public DList(){
         head = new Node<T>(null, null, null);
         tail = new Node<T>(null, null, head);
@@ -27,12 +28,14 @@ public class DList<T> implements Iterable<T>{
         head.next = newNode;
         size++;
     }
+
     public void addLast(T data){
         Node<T> newNode = new Node<T>(data, tail, tail.prev);
         tail.prev.next = newNode;
         tail.prev = newNode;
         size++;
     }
+
     public T removeFirst(){
         if(size == 0) return null;
         Node<T> first = head.next;
@@ -41,6 +44,7 @@ public class DList<T> implements Iterable<T>{
         size--;
         return first.data;
     }
+
     public T removeLast(){
         if(size == 0) return null;
         Node<T> last = tail.prev;
@@ -49,17 +53,21 @@ public class DList<T> implements Iterable<T>{
         size--;
         return last.data;
     }
+
     public T getFirst(){
         if(size == 0) return null;
         return (T) head.next.data;
     }
+
     public T getLast(){
         if(size == 0) return null;
         return (T) tail.prev.data;
     }
+
     public int size(){
         return size;
     }
+
     public boolean isEmpty(){
         return size == 0;
     }
@@ -82,80 +90,31 @@ public class DList<T> implements Iterable<T>{
         return null;
     }
 
-    public void insertBefore(Node<T> before, Node<T> after) {
-        Node<T> newNode = new Node<T>(before.data, after, after.prev);
-        after.prev.next = newNode;
-        after.prev = newNode;
-        size++;
+    public boolean add(T item) {
+        addLast(item);
+        return true;
     }
 
-    public void insertAfter(Node<T> after, Node<T> before) {
-        Node<T> newNode = new Node<T>(before.data, after.next, after);
-        after.next.prev = newNode;
-        after.next = newNode;
-        size++;
-    }
-
-   public int removeBefore(Node<T> before) {
-        if(before.prev == head) return -1;
-        Node<T> current = before.prev;
-        before.prev = current.prev;
-        current.prev.next = before;
-        size--;
-        return 0;
-    }
-
-    public int removeAfter(Node<T> after) {
-        if(after.next == tail) return -1;
-        Node<T> current = after.next;
-        after.next = current.next;
-        current.next.prev = after;
-        size--;
-        return 0;
-    }
-
-    public void insertRangeBefore(Node<T> before, DList<T> list) {
-        if(list.size == 0) return;
-        Node<T> current = list.head.next;
-        while(current != list.tail){
-            Node<T> newNode = new Node<T>(current.data, before, before.prev);
-            before.prev.next = newNode;
-            before.prev = newNode;
-            size++;
+    public boolean remove(T item) {
+        Node<T> current = head.next;
+        while(current != tail){
+            if(current.data.equals(item)){
+                current.prev.next = current.next;
+                current.next.prev = current.prev;
+                size--;
+                return true;
+            }
             current = current.next;
         }
+        return false;
     }
 
-    public void insertRangeAfter(Node<T> after, DList<T> list) {
-        if(list.size == 0) return;
-        Node<T> current = list.tail.prev;
-        while(current != list.head){
-            Node<T> newNode = new Node<T>(current.data, after.next, after);
-            after.next.prev = newNode;
-            after.next = newNode;
-            size++;
-            current = current.prev;
-        }
-    }
-
-    public void removeRange(Node<T> start, Node<T> end) {
-        if(start == end) return;
-        Node<T> current = start;
-        while(current != end){
-            Node<T> temp = current.next;
-            current.prev.next = current.next;
-            current.next.prev = current.prev;
-            size--;
-            current = temp;
-        }
-    }
-
-    public DList<T> getSublist(Node<T> rangeFirst, Node<T> rangeLast) {
+    public DList<T> backwards() {
         DList<T> list = new DList<T>();
-        Node<T> current = rangeFirst;
-        while(current != rangeLast){
-            list.addLast(current.data);
-            current = current.next;
+        Node<T> current = tail.prev;
+        while(current != head){
+            list.addFirst(current.data);
+            current = current.prev;
         }
         return list;
     }

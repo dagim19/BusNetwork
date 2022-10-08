@@ -23,6 +23,14 @@ public class Station implements Comparable {
         this.stationID = stationID;
     }
 
+    // Implement the equals method
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Station)) return false;
+        Station s = (Station) o;
+        return s.getStationID() == this.getStationID();
+    }
+
     @Override
     public int compareTo(Object o) {
         Station s = (Station) o;

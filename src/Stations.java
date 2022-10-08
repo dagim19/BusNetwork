@@ -7,11 +7,11 @@ public class Stations {
     private int numberOfStations;
     private int avail;
     private boolean changed;
-    private ArrayList<Station> stationList;
+    private DList<Station> stationList;
     HashSet<Integer> stnIds;
 
     public Stations() {
-        stationList = new ArrayList<>();
+        stationList = new DList<>();
         stnIds = new HashSet<>();
         numberOfStations = 0;
         avail = 0;
