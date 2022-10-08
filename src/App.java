@@ -24,7 +24,7 @@ public class App {
     }
 
     private static int editUserChoice() {
-        int chioce;
+        int choice;
         Utility.clear();
         StdOut.println("What do you want to do?");
         StdOut.println("Press 1: Add a new user");
@@ -33,8 +33,8 @@ public class App {
         StdOut.println("Press 4: Change a user's admin status");
         StdOut.println("Press 5: Return to main menu");
         StdOut.print("> ");
-        chioce = StdIn.readInt();
-        return chioce;
+        choice = StdIn.readInt();
+        return choice;
     }
 
     private static void handleUserEdit() {
@@ -389,7 +389,7 @@ public class App {
                     break;
                 }
             }
-        }while(choice < 1 || choice > 9 || choice != 9);
+        }while(choice > 0 && choice < 9);
     }
 
     private static int networkInfoChoice() {
@@ -519,8 +519,12 @@ public class App {
                     StdOut.println("Shortest Path");
                     StdOut.println("========================================");
                     ArrayList<StationData> path = (ArrayList<StationData>) network.shortestPath(sourceStnId, destStnId);
-                    for(StationData stationData: path) {
-                        StdOut.print(stations.mapStation(stationData.getStnId()) + " (" + stationData.getStnId() + ") -> ");
+                    if(path != null) {
+                        for(StationData stationData: path) {
+                            StdOut.print(stations.mapStation(stationData.getStnId()) + " (" + stationData.getStnId() + ") -> ");
+                        }
+                    } else {
+                        StdOut.println("No path exists between the two stations.");
                     }
                     StdOut.println("END");
                     StdOut.println("Press any key to continue...");
@@ -539,13 +543,12 @@ public class App {
                 }
                 break;
             }
-        }while(choice < 1 || choice > 6 || choice != 6);
+        }while(choice > 1 && choice < 6);
     }
 
 
     private static int menuChoice() {
         int choice;
-        // clear the screen
         System.out.print("\033[H\033[2J");
         StdOut.println("MAIN SWITCH BOARD");
         StdOut.println("Press 1: Network Information");
@@ -624,7 +627,7 @@ public class App {
                 }
                 break;
             }
-        }while (choice < 1 || choice > 5 || choice != 5);
+        }while (choice < 1 || choice > 5);
     }
 
 
