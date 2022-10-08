@@ -48,10 +48,10 @@ public class App {
                    StdOut.println("Enter New Line");
                    int lineNumber;
                    do {
-                       StdOut.println("Please enter the new line number. (Enter -1 to abort)\n>");
+                       StdOut.println("Please enter the new Line-ID. (Enter -1 to abort)\n>");
                        lineNumber = StdIn.readInt();
                        if(network.lineNumbers.contains(lineNumber))
-                           StdOut.println("Line number already exists. Please enter a new line number.");
+                           StdOut.println("Line-ID already exists. Please enter a new line number.");
                        else break;
                      }while(network.lineNumbers.contains(lineNumber));
 
@@ -291,13 +291,13 @@ public class App {
                     // Change the station number of a station
                     clear();
 
-                    StdOut.println("Change the station number of a station");
-                    StdOut.println("Enter the station number. (Enter -1 to abort)\n>");
+                    StdOut.println("Update the Station-ID of a station");
+                    StdOut.println("Enter the existing Station-ID. (Enter -1 to abort)\n>");
                     int stnId = StdIn.readInt();
 
                     do {
                         if(!stations.stnIds.contains(stnId)) {
-                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            StdOut.println("The Station-ID you entered does not exist. Please enter a valid Station-ID. (Enter -1 to abort)\n>");
                             stnId = StdIn.readInt();
                         }
                         else break;
@@ -306,15 +306,15 @@ public class App {
                     if(stnId == -1)
                         break;
 
-                    StdOut.println("Enter the new station number.\n>");
+                    StdOut.println("Enter the new Station-ID.\n>");
                     int newStnId = StdIn.readInt();
 
                     if(stations.changeStnId(stnId, newStnId)) {
-                        StdOut.println("Successfully changed the station number");
+                        StdOut.println("Successfully changed the Station-ID");
                         StdOut.println("Press any key to continue...");
                         StdIn.readString();
                     }else{
-                        StdOut.println("Failed to change the station number");
+                        StdOut.println("Failed to change the Station-ID");
                         StdOut.println("Press any key to continue...");
                         StdIn.readString();
                     }
