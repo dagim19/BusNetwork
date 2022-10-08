@@ -360,7 +360,7 @@ public class App {
                     StdOut.println("Network Information");
                     StdOut.println("There are " + network.nubLines + " lines in the network.");
                     StdOut.println("========================================");
-                    StdOut.println("Line Number\tNumber of Stations");
+                    StdOut.println("Line-ID\tNumber of Stations");
                     StdOut.println("========================================");
                     for (Line line: network.lines) {
                         StdOut.println(line.getLineNumber() + "\t\t" + line.getNumberOfStations());
@@ -373,7 +373,7 @@ public class App {
                 {
                     clear();
                     StdOut.println("Line Information");
-                    StdOut.println("Enter the line number. (Enter -1 to abort)\n>");
+                    StdOut.println("Enter the Line-ID. (Enter -1 to abort)\n>");
                     int lineNumber = StdIn.readInt();
 
                     do {
@@ -399,7 +399,7 @@ public class App {
                 {
                     clear();
                     StdOut.println("Station Information");
-                    StdOut.println("Enter the station number. (Enter -1 to abort)\n>");
+                    StdOut.println("Enter the Station-ID. (Enter -1 to abort)\n>");
                     int stnId = StdIn.readInt();
 
                     do {
@@ -425,12 +425,12 @@ public class App {
                 {
                     clear();
                     StdOut.println("Shortest Path Information");
-                    StdOut.println("Enter the station number of the source station. (Enter -1 to abort)\n>");
+                    StdOut.println("Enter the Station-ID of the source station. (Enter -1 to abort)\n>");
                     int sourceStnId = StdIn.readInt();
 
                     do {
                         if(!stations.stnIds.contains(sourceStnId)) {
-                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            StdOut.println("The Station-ID you entered does not exist. Please enter a valid Station-ID. (Enter -1 to abort)\n>");
                             sourceStnId = StdIn.readInt();
                         }
                         else break;
@@ -439,12 +439,12 @@ public class App {
                     if(sourceStnId == -1)
                         break;
 
-                    StdOut.println("Enter the station number of the destination station. (Enter -1 to abort)\n>");
+                    StdOut.println("Enter the Station-ID of the destination station. (Enter -1 to abort)\n>");
                     int destStnId = StdIn.readInt();
 
                     do {
                         if(!stations.stnIds.contains(destStnId)) {
-                            StdOut.println("The station number you entered does not exist. Please enter a valid station number. (Enter -1 to abort)\n>");
+                            StdOut.println("The Station-ID you entered does not exist. Please enter a valid Station-ID. (Enter -1 to abort)\n>");
                             destStnId = StdIn.readInt();
                         }
                         else break;
